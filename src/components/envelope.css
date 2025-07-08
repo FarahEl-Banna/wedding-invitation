@@ -1,0 +1,20 @@
+@import "tailwindcss";
+@reference "../index.css";
+
+@layer components{
+    .section-style {
+        @apply  min-h-[calc(100vh-5rem)] my-6 p-6 pb-24 flex flex-col items-center justify-center text-center space-y-4 min-w-2xs
+        text-text dark:text-text-dark bg-gradient-to-br from-primary/70  via-background/70 to-primary/70 dark:bg-background-dark/30
+        backdrop-blur-xs backdrop-saturate-100 border-secondary dark:border-secondary-dark
+        shadow-xl/30 rounded -z-50 
+        ; 
+        /* background: linear-gradient(0deg, bg-background, #A1BCA9), #FFFFFF;
+        opacity: 0.7; */
+      }
+}
+
+@layer utilities {
+    .preserve-3d {
+      transform-style: preserve-3d;
+    }
+  }

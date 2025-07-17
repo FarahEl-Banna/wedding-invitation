@@ -1,3 +1,5 @@
+
+
 import { useEffect, useState } from "react";
 import { useSearchParams } from 'react-router-dom';
 import './envelope.css'
@@ -40,15 +42,16 @@ export default function Envelope() {
     is_attending: 1,
     side: "B"
 });
+
   const [showRSVP, setShowRSVP] =useState(false)
   
-
+  const url = import.meta.env.VITE_API_URL ||  'http://localhost:4000';
   useEffect(() => {
     if (!code) {
       console.error('No code provided in the URL');
       return;
     }
-    fetch(`http://localhost:4000/api/check-code?code=${code}`)
+    fetch(`${url}/api/check-code?code=${code}`)
       .then(res => res.json())
       .then(data => {
         if (data.message === 'Invalid code') throw new Error('Invalid or expired invitation link');
@@ -105,7 +108,7 @@ export default function Envelope() {
           </div>
 
           {/* Logo*/}
-          <div className={`absolute top-[40%] left-1/12 transition-transform transform -translate-x-1/2 -translate-y-1/2 z-30 duration-5500 origin-top preserve-3d ${
+          <div className={`absolute top-[40%] left-[1/13] md:left-1/12 transition-transform transform -translate-x-1/2 -translate-y-1/2 z-30 duration-5500 origin-top preserve-3d ${
             isOpen ? "-translate-x-1000 " : "translate-x-2/3" }`}
           style={{ transformOrigin: "top" }}
           >
@@ -131,11 +134,10 @@ export default function Envelope() {
           <Decoration/>
           <Schedule/>
           <Decoration/>
-          {showRSVP &&<Confirmation name={invitee.name} invited_count={invitee.invited_count} phone={invitee.phone}/>}
+          {showRSVP &&<Confirmation invited_count={invitee.invited_count} phone={invitee.phone}/>}
           <Decoration/> 
           <PhotoGallery/>
           <Decoration/>
-          {/* <OrganizationalDetails/> */}
           <Decoration/>
           <ClosingMsg/>
         </div>}

@@ -7,25 +7,26 @@ import 'react-phone-input-2/lib/plain.css';
 import { useState, useEffect } from 'react';
 
 type ConfirmationProps = {
-  name: string;
   invited_count: number;
   phone: string;
 };
 
-export default function Confirmation({name, invited_count,phone}:ConfirmationProps) {
+export default function Confirmation({invited_count,phone}:ConfirmationProps) {
 
   const [attending, setAttending] = useState(true);
   const [guestName, setGuestName] = useState('');
   const [inputPhone, setInputPhone] = useState('');
   const [showPopup, setShowPopup] = useState<"message" | "confirmation" | null>
   (null);
-  const [popUpMsg, setPopUpMsg] = useState('')
+  const [popUpMsg, setPopUpMsg] = useState<{mgs:string,invited_count?:number}>({mgs: '', invited_count: 0});
 
 
 
   const submitFinalRSVP = async ({guests}:{ guests: number }) => {
-    // console.log('Submitting RSVP:', { guestName, phone, attending, guests });
-  const res = await fetch('http://localhost:4000/api/rsvp', {
+
+    const url = import.meta.env.VITE_API_URL ||  'http://localhost:4000';
+ 
+  const res = await fetch(`${url}/api/rsvp`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({
@@ -35,9 +36,24 @@ export default function Confirmation({name, invited_count,phone}:ConfirmationPro
       guests: guests,
     }),
   });
+  if (!res.ok) {
+    const errorData = await res.json();
+    console.error('Error submitting RSVP:', errorData.message);
+    throw new Error(errorData.message || 'Failed to submit RSVP');
+  }
+   const data = await res.json();
+  if( res.status == 202) {
+    setShowPopup("message");
+    setPopUpMsg({mgs:`Thank you ${guestName}, your RSVP has been recorded!`});
 
-  const data = await res.json();
-  console.log(data.message);
+  }
+  else if (res.status==200) {
+     setShowPopup("message");
+    setPopUpMsg({mgs:`Your presence will be deeply missed!`});
+  
+  } else {
+    console.error('Error submitting RSVP:', data.message);
+  }
 };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -50,38 +66,32 @@ export default function Confirmation({name, invited_count,phone}:ConfirmationPro
     
   try {
     if (inputPhone!=phone) {
-      // throw new Error('Phone not found');
       setShowPopup("message")
-      setPopUpMsg('Please enter the phone number you were invited with..');
+      setPopUpMsg({mgs:'Please enter the phone number you were invited with..'});
       throw new Error('Phone not found');
     }
     if (attending === false){
         submitFinalRSVP({guests:0});
-         setShowPopup("message");
-         setPopUpMsg(`Your presence will be deeply missed!`);
       }
       else{
     if (invited_count === 1) {
       // Single attendee: just ask for name
       submitFinalRSVP({guests:1});
-      setShowPopup("message");
-      setPopUpMsg(`Thank you ${guestName}, your RSVP has been recorded!`);
     }
       else {
       setShowPopup("confirmation");
-      setPopUpMsg(`Number of attendees!`);
+      setPopUpMsg({mgs:`Number of attendees!`, invited_count: invited_count});
       }
     }
     }
    catch (err) {
     console.error(err);
-    // setError('Invalid phone number or not invited.');
   }
   };
 
   const handleConfirm = (value: string) => {
     console.log("User selected:", value);
-    submitFinalRSVP({guests: value === '1' ? 1 : invited_count});
+    submitFinalRSVP({guests: parseInt(value)});
   };
 
   return (
@@ -133,13 +143,11 @@ export default function Confirmation({name, invited_count,phone}:ConfirmationPro
         inputProps={{
     name: 'phone',
     required: true,
-    // autoFocus: true
   }}
       />
         
         <button
           type="submit"
-          // onClick={handlePhoneSubmit}
           className="px-6 py-2  text-text border-accent border-2 dark:border-accent-dark dark:text-text-dark rounded-4xl hover:bg-accent/50 dark:hover:bg-accent-dark/50 transition-colors"
         >
           Confirm Attendance
@@ -162,7 +170,7 @@ export default function Confirmation({name, invited_count,phone}:ConfirmationPro
 
 type PopupProps = {
   type: "message" | "confirmation";
-  message: string;
+  message: {mgs:string,invited_count?:number};
   onConfirm?: (value: string) => void; // for confirmation
   onClose?: () => void;                // optional external close
 };
@@ -170,6 +178,7 @@ type PopupProps = {
 function PopUp({ type, message, onConfirm, onClose }: PopupProps) {
  const [visible, setVisible] = useState(true);
   const [selection, setSelection] = useState("");
+const [selectionOptions, setSelectionOptions] = useState<string[]>([]);
 
   useEffect(() => {
     if (type === "message") {
@@ -190,12 +199,19 @@ function PopUp({ type, message, onConfirm, onClose }: PopupProps) {
 
   if (!visible) return null;
 
+  useEffect(() => {
+    if (type === "confirmation" ) {
+      if (message.invited_count) {
+      const options = Array.from({ length: message.invited_count-1 }, (_, i) => (i+2).toString());
+      setSelectionOptions(options);
+    }
+  }},[])
 
   return (
     <div className='fixed inset-0 z-50 flex items-center justify-center bg-black/40'>
-    <div className="aspect-square p-5 w-1/3 bg-primary dark:bg-primary-dark rounded-4xl flex flex-col items-center justify-center text-text dark:text-text-dark ">
+    <div className="aspect-square p-5 w-2/3 md:w-1/3 bg-primary dark:bg-primary-dark rounded-4xl flex flex-col items-center justify-center text-text dark:text-text-dark ">
         <img src={headimg} alt="head image" loading="lazy" className="aspect-square w-1/2 max-w-64"/>
-        <p className='border-accent border-b-2 text-2xl'>{message}</p>
+        <p className='border-accent border-b-2 text-2xl'>{message.mgs}</p>
          {type === "confirmation" && <div className='flex flex-col items-stretch space-y-4 text-md mt-4'>
           <label >
         <input
@@ -207,7 +223,7 @@ function PopUp({ type, message, onConfirm, onClose }: PopupProps) {
           className="accent-accent dark:accent-accent-dark"
         /><span className="ml-2 font-">I am attending alone</span>
         </label>
-      <label>
+      {message.invited_count==2?<label>
         <input
           type="radio"
           name="attendance"
@@ -215,8 +231,19 @@ function PopUp({ type, message, onConfirm, onClose }: PopupProps) {
           checked={selection== '2'}
           onChange={() => setSelection('2')}
           className="accent-accent dark:accent-accent-dark"
-        /><span className="ml-2">I am attending with the family</span>
-        </label>
+        /><span className="ml-2">I am attending with the my partner</span>
+        </label>:
+        selectionOptions.map((options)=><label key={options}>
+        <input
+          type="radio"
+          name="attendance"
+          value={options}
+          checked={selection== options}
+          onChange={() => setSelection(`${options}`)}
+          className="accent-accent dark:accent-accent-dark"
+        /><span className="ml-2">{options} family members are attending</span>
+        </label>)
+        }
 
         <button
         disabled={!selection}

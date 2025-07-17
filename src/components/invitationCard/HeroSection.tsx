@@ -20,7 +20,7 @@ export default function HeroSection(){
           />
       <h1 className="my-1 text-6xl  mb-4">Naeem Karkout 
         <br/>& <br/> Dima Al Banna</h1>
-      <p>It is impossible to imagine this day without our closest people. Thus, we ae happy to invite you to join and share this wonderful occasion with us</p>
+      <p>It is impossible to imagine this day without our closest people. Thus, we are happy to invite you to join and share this wonderful occasion with us</p>
     </section>
     )
 }

@@ -74,8 +74,8 @@ const TimelineItem: React.FC<TimelineItemProps> = ({ time, title, location,locat
         <div className="flex flex-col items-center text-center text-brown-800">
         <img src={icon} alt="icon" className="aspect-square w-1/2 max-w-32 my-2 text-accent" />
           <p className="w-full font-semibold border-b-1">{time}</p>
-          <p className="text-md font-medium">{title}</p>
-          {location && <a className="whitespace-pre-line pointer-coarse text-2xl hover:font-semibold hover:underline font-seasons" href={locationLink} target="_blank" rel="noopener noreferrer">{location} </a>}
+          <p className="text-[18px] md:text-3xl font-medium">{title}</p>
+          {location && <a className="whitespace-pre-line pointer-coarse text-[20px]  md:text-2xl hover:font-semibold hover:underline font-seasons underline" href={locationLink} target="_blank" rel="noopener noreferrer">{location} </a>}
         </div>
       </div>
     </div>

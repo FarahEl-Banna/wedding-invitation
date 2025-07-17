@@ -43,8 +43,8 @@ export default function Timer() {
       <h3 className="text-3xl md:text-5xl md:p-10 font-bold ">Our Wedding</h3>
 
       {/* Timer */}
-      <div className=" text-text dark:text-text-dark border-accent border-1  rounded-lg shadow-lg w-full max-w-sm p-6 ">
-        <div className="mx-10 flex justify-between text-center font-mono text-lg">
+      <div className=" text-text dark:text-text-dark border-accent border-1  rounded-lg shadow-lg w-full max-w-sm py-6 px-1 md:p-6 ">
+        <div className="mx-6 md:mx-10 flex justify-between text-center font-mono text-lg">
           <div>
             <h3 className="text-4xl font-bold">{timeLeft.days}</h3>
             <p className="text-sm text-text">Days</p>

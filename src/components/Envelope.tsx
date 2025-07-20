@@ -132,7 +132,7 @@ export default function Envelope() {
           <Decoration/>
           <Timer/>
           <Decoration/>
-          <Schedule/>
+          <Schedule showRSVP={showRSVP}/>
           <Decoration/>
           {showRSVP &&<Confirmation invited_count={invitee.invited_count} phone={invitee.phone}/>}
           <Decoration/> 

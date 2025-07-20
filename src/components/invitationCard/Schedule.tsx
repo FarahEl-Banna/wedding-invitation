@@ -14,7 +14,11 @@ interface TimelineItemProps {
   align?: "left" | "right"; // Default is "left"
 }
 
-export default function Schedule(){
+type ScheduleProps = {
+  showRSVP: boolean;
+};
+
+export default function Schedule({showRSVP}:ScheduleProps) {
 
     return(
       <section className="section-style">
@@ -49,14 +53,14 @@ export default function Schedule(){
           icon={carIcon}
           align="left"
         />
-        <TimelineItem
+       {showRSVP && <TimelineItem
           time="8:30 PM"
           title="Evening"
           location="At Sama Chtoura"
           locationLink="https://maps.app.goo.gl/jxmUZseqVPFCHYAMA"	
           icon={betrothedIcon}
           align="right"
-        />
+        />}
       </div>
       </div>
       </section>
